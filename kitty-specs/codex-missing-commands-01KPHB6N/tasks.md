@@ -10,10 +10,10 @@
 | T004 | Refactor `tasks-finalize.md` from override to source template | WP01 | [D] |
 | T005 | Create `merge.md` source template | WP01 | [D] |
 | T006 | Create `status.md` source template | WP01 | [D] |
-| T007 | Verify all 16 skills install via `agent config add codex` | WP02 | |
-| T008 | Verify all 16 skills install via `agent config add vibe` | WP02 | |
-| T009 | Run `command_verifier` on all rendered skills | WP02 | |
-| T010 | Update `status.json` in mission spec | WP02 | |
+| T007 | Verify all 16 skills install via `agent config add codex` | WP02 | | [D] |
+| T008 | Verify all 16 skills install via `agent config add vibe` | WP02 | | [D] |
+| T009 | Run `command_verifier` on all rendered skills | WP02 | | [D] |
+| T010 | Update `status.json` in mission spec | WP02 | | [D] |
 
 ## WP01 - Registration and Templates
 **Goal**: Register the 5 missing commands and create their source templates.
@@ -33,10 +33,10 @@
 ## WP02 - Verification and Parity
 **Goal**: Ensure all skills are correctly installed and validated.
 
-- [ ] T007 Verify all 16 skills install via `agent config add codex` (WP02)
-- [ ] T008 Verify all 16 skills install via `agent config add vibe` (WP02)
-- [ ] T009 Run `command_verifier` on all rendered skills (WP02)
-- [ ] T010 Update `status.json` in mission spec (WP02)
+- [x] T007 Verify all 16 skills install via `agent config add codex` (WP02)
+- [x] T008 Verify all 16 skills install via `agent config add vibe` (WP02)
+- [x] T009 Run `command_verifier` on all rendered skills (WP02)
+- [x] T010 Update `status.json` in mission spec (WP02)
 
 **Implementation Sketch**:
 1. Use a temporary project or the current project to run `spec-kitty agent config add codex`.
