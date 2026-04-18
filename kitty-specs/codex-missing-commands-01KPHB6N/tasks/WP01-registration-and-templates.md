@@ -21,7 +21,11 @@ subtasks:
 - T004
 - T005
 - T006
-history: []
+history:
+- actor: gemini
+  timestamp: '2026-04-18T22:45:00Z'
+  event: completed
+  notes: Registered 5 missing commands and added templates.
 authoritative_surface: src/specify_cli/
 execution_mode: code_change
 owned_files:

@@ -18,12 +18,12 @@
 ## WP01 - Registration and Templates
 **Goal**: Register the 5 missing commands and create their source templates.
 
-- [ ] T001 Update `CANONICAL_COMMANDS` in `command_installer.py` (WP01)
-- [ ] T002 Refactor `accept.md` from override to source template (WP01)
-- [ ] T003 Refactor `dashboard.md` from override to source template (WP01)
-- [ ] T004 Refactor `tasks-finalize.md` from override to source template (WP01)
-- [ ] T005 Create `merge.md` source template (WP01)
-- [ ] T006 Create `status.md` source template (WP01)
+- [x] T001 Update `CANONICAL_COMMANDS` in `command_installer.py` (WP01)
+- [x] T002 Refactor `accept.md` from override to source template (WP01)
+- [x] T003 Refactor `dashboard.md` from override to source template (WP01)
+- [x] T004 Refactor `tasks-finalize.md` from override to source template (WP01)
+- [x] T005 Create `merge.md` source template (WP01)
+- [x] T006 Create `status.md` source template (WP01)
 
 **Implementation Sketch**:
 1. Add "accept", "dashboard", "merge", "status", "tasks-finalize" to `CANONICAL_COMMANDS` in `src/specify_cli/skills/command_installer.py`.
