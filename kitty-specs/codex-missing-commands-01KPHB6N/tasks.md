@@ -4,12 +4,12 @@
 
 | ID | Description | WP | Parallel |
 |----|-------------|----|----------|
-| T001 | Update `CANONICAL_COMMANDS` in `command_installer.py` | WP01 | |
-| T002 | Refactor `accept.md` from override to source template | WP01 | [P] |
-| T003 | Refactor `dashboard.md` from override to source template | WP01 | [P] |
-| T004 | Refactor `tasks-finalize.md` from override to source template | WP01 | [P] |
-| T005 | Create `merge.md` source template | WP01 | [P] |
-| T006 | Create `status.md` source template | WP01 | [P] |
+| T001 | Update `CANONICAL_COMMANDS` in `command_installer.py` | WP01 | | [D] |
+| T002 | Refactor `accept.md` from override to source template | WP01 | [D] |
+| T003 | Refactor `dashboard.md` from override to source template | WP01 | [D] |
+| T004 | Refactor `tasks-finalize.md` from override to source template | WP01 | [D] |
+| T005 | Create `merge.md` source template | WP01 | [D] |
+| T006 | Create `status.md` source template | WP01 | [D] |
 | T007 | Verify all 16 skills install via `agent config add codex` | WP02 | |
 | T008 | Verify all 16 skills install via `agent config add vibe` | WP02 | |
 | T009 | Run `command_verifier` on all rendered skills | WP02 | |
