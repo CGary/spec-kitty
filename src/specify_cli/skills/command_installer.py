@@ -45,15 +45,20 @@ SUPPORTED_AGENTS: tuple[str, ...] = ("codex", "vibe")
 #: Matches the files under
 #: ``src/specify_cli/missions/software-dev/command-templates/``.
 CANONICAL_COMMANDS: tuple[str, ...] = (
+    "accept",
     "analyze",
     "charter",
     "checklist",
+    "dashboard",
     "implement",
+    "merge",
     "plan",
     "research",
     "review",
     "specify",
+    "status",
     "tasks",
+    "tasks-finalize",
     "tasks-outline",
     "tasks-packages",
 )
