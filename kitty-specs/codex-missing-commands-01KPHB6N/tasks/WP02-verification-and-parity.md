@@ -12,11 +12,15 @@ requirement_refs:
 planning_base_branch: spec-gary
 merge_target_branch: spec-gary
 branch_strategy: Planning artifacts for this feature were generated on spec-gary. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into spec-gary unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-codex-missing-commands-01KPHB6N
+base_commit: cd2817bc35fecb599fe90f0ec600722c6b830d07
+created_at: '2026-04-18T22:54:59.433829+00:00'
 subtasks:
 - T007
 - T008
 - T009
 - T010
+shell_pid: '526941'
 history: []
 authoritative_surface: kitty-specs/codex-missing-commands-01KPHB6N/
 execution_mode: code_change
