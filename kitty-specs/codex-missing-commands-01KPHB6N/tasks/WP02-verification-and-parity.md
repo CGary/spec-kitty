@@ -20,13 +20,14 @@ subtasks:
 - T008
 - T009
 - T010
-shell_pid: '526941'
+shell_pid: "526941"
 history: []
 authoritative_surface: kitty-specs/codex-missing-commands-01KPHB6N/
 execution_mode: code_change
 owned_files:
 - kitty-specs/codex-missing-commands-01KPHB6N/status.json
 tags: []
+agent: "claude"
 ---
 
 # WP02 - Verification and Parity
@@ -57,3 +58,7 @@ Update `kitty-specs/codex-missing-commands-01KPHB6N/status.json` to reflect the 
 - Installation confirmed for both codex and vibe.
 - Exactly 16 skills present in `.agents/skills/`.
 - All skills pass structural verification.
+
+## Activity Log
+
+- 2026-04-18T22:54:59Z – claude – shell_pid=526941 – Assigned agent via action command
