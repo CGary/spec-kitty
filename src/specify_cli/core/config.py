@@ -48,7 +48,7 @@ IDE_AGENTS = {"cursor", "windsurf", "copilot", "kilocode", "antigravity"}
 
 AGENT_COMMAND_CONFIG: dict[str, dict[str, str]] = {
     "claude": {"dir": ".claude/commands", "ext": "md", "arg_format": "$ARGUMENTS"},
-    "gemini": {"dir": ".gemini/commands", "ext": "toml", "arg_format": "{{args}}"},
+    "gemini": {"dir": ".gemini/commands", "ext": "toml", "arg_format": "{{args}}", "prefix": "sk"},
     "copilot": {"dir": ".github/prompts", "ext": "prompt.md", "arg_format": "$ARGUMENTS"},
     "cursor": {"dir": ".cursor/commands", "ext": "md", "arg_format": "$ARGUMENTS"},
     "qwen": {"dir": ".qwen/commands", "ext": "toml", "arg_format": "{{args}}"},

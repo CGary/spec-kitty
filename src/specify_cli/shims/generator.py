@@ -217,15 +217,16 @@ def generate_all_shims(repo_root: Path) -> list[Path]:
 
     for agent_root, command_subdir in agent_dirs:
         agent_key = AGENT_DIR_TO_KEY.get(agent_root, agent_root.lstrip("."))
+        config = AGENT_COMMAND_CONFIG.get(agent_key, {})
+        ext = config.get("ext", "md")
+        prefix = config.get("prefix", "spec-kitty")
 
         target_dir = repo_root / agent_root / command_subdir
         target_dir.mkdir(parents=True, exist_ok=True)
 
         for skill in cli_skills:
-            from specify_cli.core.config import AGENT_COMMAND_CONFIG as _ACC
-            _agent_cfg = _ACC.get(agent_key, {})
-            _ext = _agent_cfg.get("ext", "md")
-            filename = f"spec-kitty.{skill}.{_ext}"
+            stem = skill.replace("-", "_") if agent_key == "codex" else skill
+            filename = f"{prefix}.{stem}.{ext}" if ext else f"{prefix}.{stem}"
             content = generate_shim_content_for_agent(skill, agent_key)
             out_path = target_dir / filename
             out_path.write_text(content, encoding="utf-8")

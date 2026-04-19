@@ -94,12 +94,13 @@ def _compute_output_filename(command: str, agent_key: str) -> str:
         return f"spec-kitty.{command}.md"
 
     ext: str = config["ext"]
+    prefix = config.get("prefix", "spec-kitty")
     stem = command
     if agent_key == "codex":
         stem = stem.replace("-", "_")
     if ext:
-        return f"spec-kitty.{stem}.{ext}"
-    return f"spec-kitty.{stem}"
+        return f"{prefix}.{stem}.{ext}"
+    return f"{prefix}.{stem}"
 
 
 def _sync_agent_commands(agent_key: str, templates_dir: Path, script_type: str) -> None:
