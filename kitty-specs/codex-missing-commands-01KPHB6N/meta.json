@@ -1,8 +1,22 @@
 {
+  "accept_commit": "36de0593fa33bef441aa33b492279cce965b33dd",
+  "acceptance_history": [
+    {
+      "accept_commit": "36de0593fa33bef441aa33b492279cce965b33dd",
+      "acceptance_mode": "pr",
+      "accepted_at": "2026-04-19T19:39:21.110415+00:00",
+      "accepted_by": "gary",
+      "accepted_from_commit": "fc65f3d33a8c89fc08134f234a26b83d1844173c"
+    }
+  ],
+  "acceptance_mode": "pr",
+  "accepted_at": "2026-04-19T19:39:21.110415+00:00",
+  "accepted_by": "gary",
+  "accepted_from_commit": "fc65f3d33a8c89fc08134f234a26b83d1844173c",
   "created_at": "2026-04-18T22:25:55.048883+00:00",
   "friendly_name": "Codex Missing Commands",
   "mission_id": "01KPHB6NAB3V4482S6YX4EDTQ8",
-  "mission_number": null,
+  "mission_number": 88,
   "mission_slug": "codex-missing-commands-01KPHB6N",
   "mission_type": "software-dev",
   "slug": "codex-missing-commands-01KPHB6N",

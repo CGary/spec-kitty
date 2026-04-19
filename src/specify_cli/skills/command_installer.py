@@ -41,7 +41,7 @@ from specify_cli.skills import command_renderer
 
 SUPPORTED_AGENTS: tuple[str, ...] = ("codex", "vibe")
 
-#: The 11 canonical command templates that exist in the current codebase.
+#: The 16 canonical command templates that exist in the current codebase.
 #: Matches the files under
 #: ``src/specify_cli/missions/software-dev/command-templates/``.
 CANONICAL_COMMANDS: tuple[str, ...] = (

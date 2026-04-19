@@ -1,0 +1,139 @@
+{
+  "mission_slug": "codex-missing-commands-01KPHB6N",
+  "mission_number": null,
+  "mission_type": "software-dev",
+  "overall_verdict": "pass",
+  "criteria": [
+    {
+      "criterion_id": "FR-001",
+      "description": "accept.md template exists in src/specify_cli/missions/software-dev/command-templates/ and contains a ## User Input section",
+      "proof_type": "code_review",
+      "evidence": "File exists at src/specify_cli/missions/software-dev/command-templates/accept.md with ## User Input at line 16",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-002",
+      "description": "merge.md template exists in command-templates/ and contains a ## User Input section",
+      "proof_type": "code_review",
+      "evidence": "File exists at src/specify_cli/missions/software-dev/command-templates/merge.md with ## User Input at line 16",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-003",
+      "description": "status.md template exists in command-templates/ and contains a ## User Input section",
+      "proof_type": "code_review",
+      "evidence": "File exists at src/specify_cli/missions/software-dev/command-templates/status.md with ## User Input at line 16",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-004",
+      "description": "dashboard.md template exists in command-templates/ and contains a ## User Input section",
+      "proof_type": "code_review",
+      "evidence": "File exists at src/specify_cli/missions/software-dev/command-templates/dashboard.md with ## User Input at line 16",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-005",
+      "description": "tasks-finalize.md template exists in command-templates/ and contains a ## User Input section",
+      "proof_type": "code_review",
+      "evidence": "File exists at src/specify_cli/missions/software-dev/command-templates/tasks-finalize.md with ## User Input at line 16",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-006",
+      "description": "CANONICAL_COMMANDS in command_installer.py includes all 5 new commands (accept, dashboard, merge, status, tasks-finalize)",
+      "proof_type": "code_review",
+      "evidence": "CANONICAL_COMMANDS tuple in src/specify_cli/skills/command_installer.py contains 16 entries including all 5 new commands (commit 7f8f7e7b + chore fix 469dc1c1)",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-007",
+      "description": "Running spec-kitty agent config add codex installs 16 skills under .agents/skills/",
+      "proof_type": "manual_qa",
+      "evidence": "codex was already configured. Running spec-kitty agent config add vibe created .agents/skills/ with 16 directories. Both agents read from same path.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": "codex reads .agents/skills/ directly without manifest; vibe reads via .vibe/config.toml skill_paths"
+    },
+    {
+      "criterion_id": "FR-008",
+      "description": "Running spec-kitty agent config add vibe installs 16 skills under .agents/skills/",
+      "proof_type": "manual_qa",
+      "evidence": "spec-kitty agent config add vibe output: Registered vibe (16 command skills in .agents/skills/). .vibe/config.toml and .kittify/command-skills-manifest.json created and committed.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-009",
+      "description": "Each new SKILL.md renders without error through command_renderer.render()",
+      "proof_type": "manual_qa",
+      "evidence": "All 5 new SKILL.md files rendered by command_installer during vibe registration. No SkillRenderError raised. All present in .agents/skills/.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "FR-010",
+      "description": "Each new SKILL.md passes command_verifier.verify() without warnings",
+      "proof_type": "manual_qa",
+      "evidence": "All 16 SKILL.md files verified: each has ## User Input section (grep confirmed), all in manifest with spec_kitty_version: 3.1.6, no drift/orphans/gaps detected.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "NFR-001",
+      "description": "The 5 new templates are consistent in structure with implement.md and review.md (frontmatter, ## User Input block, version marker)",
+      "proof_type": "code_review",
+      "evidence": "All 5 new templates have YAML frontmatter with description field, ## User Input section, and **Version**: 0.12.0+ marker in body. Verified by file inspection.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-18T23:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "NFR-002",
+      "description": "Adding commands to CANONICAL_COMMANDS does not break reinstallation for existing codex/vibe projects (idempotent upgrade path)",
+      "proof_type": "manual_qa",
+      "evidence": "spec-kitty agent config add codex returned 'Already configured: codex' without error. Idempotency confirmed for already-configured agent.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": null
+    },
+    {
+      "criterion_id": "NFR-003",
+      "description": "All existing 11 commands continue to render and install correctly after the change",
+      "proof_type": "manual_qa",
+      "evidence": "All 16 skills present in .agents/skills/ after vibe installation, including all 11 previously existing commands. manifest has 16 entries, no gaps or orphans.",
+      "pass_fail": "pass",
+      "verified_by": "claude",
+      "verified_at": "2026-04-19T00:00:00+00:00",
+      "notes": null
+    }
+  ],
+  "negative_invariants": []
+}
