@@ -1,16 +1,16 @@
 {
-  "event_count": 15,
-  "last_event_id": "01KPKTZ520FR5B5VFW9CEP371G",
-  "materialized_at": "2026-04-19T21:39:55.073001+00:00",
+  "event_count": 16,
+  "last_event_id": "01KPKTZ5WK7BZNPK4BK8CDKGH0",
+  "materialized_at": "2026-04-19T21:39:55.923938+00:00",
   "mission_number": "88",
   "mission_slug": "codex-missing-commands-01KPHB6N",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 1,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 1,
+    "done": 2,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -27,9 +27,9 @@
     "WP02": {
       "actor": "user",
       "force_count": 4,
-      "lane": "approved",
-      "last_event_id": "01KPKKVG7RJZ3D5B8RRFJ0J2HJ",
-      "last_transition_at": "2026-04-19T19:35:35.416650+00:00"
+      "lane": "done",
+      "last_event_id": "01KPKTZ5WK7BZNPK4BK8CDKGH0",
+      "last_transition_at": "2026-04-19T21:39:55.923938+00:00"
     }
   }
 }
