@@ -36,8 +36,8 @@ from specify_cli.sync.feature_flags import (
 
 console = Console()
 
-_STATUS_ACCESS_TOKEN_LABEL = "Access token"
-_STATUS_REFRESH_TOKEN_LABEL = "Refresh token"
+_STATUS_ACCESS_TOKEN_LABEL = "Access token"  # noqa: S105
+_STATUS_REFRESH_TOKEN_LABEL = "Refresh token"  # noqa: S105
 _STATUS_LAST_SYNC_LABEL = "Last Sync"
 
 
@@ -349,6 +349,43 @@ def share(
         console.print("[dim]Waiting for a team admin to approve the repository.[/dim]")
 
 
+@app.command()
+def unshare(
+    team_slug: str = typer.Argument(..., help="Team slug to stop sharing this repository into."),
+) -> None:
+    """Stop sharing the current repository from this developer to one team."""
+    from specify_cli.sync.sharing_client import (
+        RepositorySharingClientError,
+        leave_repository_share_sync,
+    )
+
+    if not is_saas_sync_enabled():
+        console.print(f"[red]{saas_sync_disabled_message()}[/red]")
+        raise typer.Exit(1)
+
+    routing = _require_active_checkout()
+    _require_authenticated_session()
+
+    if routing.project_uuid is None:
+        console.print("[red]Error:[/red] Current checkout has no project UUID.")
+        raise typer.Exit(1)
+
+    try:
+        leave_repository_share_sync(
+            source_project_uuid=routing.project_uuid,
+            destination_team_slug=team_slug,
+        )
+    except RepositorySharingClientError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    console.print(
+        f"[green]✓[/green] Stopped sharing [cyan]{routing.repo_slug or routing.project_slug or routing.project_uuid}[/cyan] "
+        f"to [cyan]{team_slug}[/cyan] from this developer."
+    )
+    console.print("[dim]Private Teamspace data was kept intact.[/dim]")
+
+
 @app.command(name="opt-out")
 def opt_out(
     checkout_only: bool = typer.Option(
@@ -608,7 +645,7 @@ def _git_repair(workspace_path: Path) -> bool:
 
 
 @app.command(name="workspace")
-def sync_workspace(
+def sync_workspace(  # noqa: C901
     repair: bool = typer.Option(
         False,
         "--repair",
@@ -1178,7 +1215,7 @@ def diagnose(
 
 
 @app.command()
-def doctor() -> None:
+def doctor() -> None:  # noqa: C901
     """Diagnose sync health: queue, auth, and server connectivity.
 
     Runs a comprehensive check of offline queue state, authentication
@@ -1191,7 +1228,9 @@ def doctor() -> None:
     from datetime import datetime
 
     from specify_cli.auth import get_token_manager
+    from specify_cli.sync.body_queue import OfflineBodyUploadQueue
     from specify_cli.sync.config import SyncConfig
+    from specify_cli.sync.diagnose import diagnose_body_queue
     from specify_cli.sync.queue import OfflineQueue
 
     console.print()
@@ -1203,6 +1242,8 @@ def doctor() -> None:
     # --- 1. Queue health ---
     queue = OfflineQueue()
     stats = queue.get_queue_stats()
+    body_queue = OfflineBodyUploadQueue(db_path=queue.db_path)
+    body_diagnostics = diagnose_body_queue(body_queue)["body_queue"]
     queue_size = stats.total_queued
     max_size = stats.max_queue_size
     pct = (queue_size / max_size * 100) if max_size > 0 else 0
@@ -1221,6 +1262,11 @@ def doctor() -> None:
         table.add_row("Oldest event", "[dim]n/a (empty)[/dim]")
 
     table.add_row("Queue DB", str(queue.db_path))
+    table.add_row(
+        "Body uploads",
+        f"{body_diagnostics['total_tasks']} queued, "
+        f"{body_diagnostics['recorded_failure_count']} recorded failure(s)",
+    )
 
     if pct >= 100:
         issues.append(
@@ -1230,6 +1276,11 @@ def doctor() -> None:
     elif pct >= 80:
         issues.append(
             f"Queue is {pct:.0f}% full. Consider syncing soon with `spec-kitty sync now`."
+        )
+    if body_diagnostics["recorded_failure_count"] > 0:
+        issues.append(
+            "Body upload failures were recorded. Review the recent body upload failures below "
+            "and fix the underlying artifact or contract mismatch."
         )
 
     # --- 2. Auth status ---
@@ -1337,6 +1388,29 @@ def doctor() -> None:
         for event_type, count in stats.top_event_types:
             type_table.add_row(event_type, f"{count:,}")
         console.print(type_table)
+        console.print()
+
+    recent_failures = body_diagnostics["recent_failures"]
+    if recent_failures:
+        failure_table = Table(
+            title="Recent Body Upload Failures",
+            show_header=True,
+            header_style="bold",
+            show_lines=False,
+            expand=False,
+        )
+        failure_table.add_column("Artifact", style="cyan")
+        failure_table.add_column("Mission", style="dim")
+        failure_table.add_column("Count", justify="right")
+        failure_table.add_column("Reason")
+        for failure in recent_failures:
+            failure_table.add_row(
+                str(failure["artifact_path"]),
+                str(failure["mission_slug"]),
+                str(failure["failure_count"]),
+                str(failure["failure_reason"]),
+            )
+        console.print(failure_table)
         console.print()
 
     # --- 5. Summary ---

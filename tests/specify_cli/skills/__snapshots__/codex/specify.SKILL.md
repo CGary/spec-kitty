@@ -7,13 +7,13 @@ user-invocable: true
 
 **Version**: 0.11.0+
 
-## 📍 WORKING DIRECTORY: Stay in the project root checkout
+## 📍 WORKING DIRECTORY: Stay in the repository root checkout
 
-**IMPORTANT**: Specify works in the project root checkout. NO worktrees are created.
+**IMPORTANT**: Specify works in the repository root checkout. NO worktrees are created.
 
 ```bash
-# Run from project root:
-cd /path/to/project/root  # Your project root checkout
+# Run from the repository root checkout:
+cd /path/to/project/root  # Your repository root checkout
 
 # All planning artifacts are created in the project root and committed:
 # - kitty-specs/<mission_slug>/spec.md → Created in project root
@@ -156,11 +156,24 @@ Before running any scripts or writing to disk you **must** conduct a structured 
   - **Complex Features** (new subsystems, integrations): Ask 3-5 questions covering goals, users, constraints, risks
   - **Platform/Critical Features** (authentication, payments, infrastructure): Full discovery with 5+ questions
 
+- **Scenario-first discovery**: For any non-trivial feature, prefer concrete
+  workflow questions over abstract opinion prompts. Ask for the primary actor,
+  trigger, happy-path outcome, and the most common exception or branch.
+
+- **Terminology discipline**: If the request introduces business or domain
+  terms that may drift, ask which term is canonical and which synonyms should
+  be avoided. When relevant, carry those choices into the optional Domain
+  Language section of the spec instead of leaving them implicit.
+
+- **Rule probing**: For workflows with approvals, validations, state changes,
+  or compliance implications, ask what must always be true and which
+  transitions or checks cannot be skipped.
+
 - **User signals to reduce questioning**: If the user says "just testing", "quick prototype", "skip to next phase", "stop asking questions" - recognize this as a signal to minimize discovery and proceed with reasonable defaults.
 
 - **First response rule**:
   - For TRIVIAL features (hello world, simple test): Ask ONE clarifying question, then if the answer confirms it's simple, proceed directly to spec generation
-  - For other features: Ask a single focused discovery question and end with `WAITING_FOR_DISCOVERY_INPUT`
+  - For other features: Ask a single focused discovery question anchored in the primary user scenario and end with `WAITING_FOR_DISCOVERY_INPUT`
 
 - If the user provides no initial description (empty command), stay in **Interactive Interview Mode**: keep probing with one question at a time.
 
@@ -170,8 +183,9 @@ Discovery requirements (scale to feature complexity):
 
 1. Maintain a **Discovery Questions** table internally covering questions appropriate to the feature's complexity (1-2 for trivial, up to 5+ for complex). Track columns `#`, `Question`, `Why it matters`, and `Current insight`. Do **not** render this table to the user.
 2. For trivial features, reasonable defaults are acceptable. Only probe if truly ambiguous.
-3. When you have sufficient context for the feature's scope, paraphrase into an **Intent Summary** and confirm. For trivial features, this can be very brief.
-4. If user explicitly asks to skip questions or says "just testing", acknowledge and proceed with minimal discovery.
+3. When you have sufficient context for the feature's scope, paraphrase into an **Intent Summary** and confirm. For trivial features, this can be very brief. For non-trivial features, include the primary actor, trigger/success outcome, key constraint, and any explicit assumptions or deferred decisions.
+4. Before leaving the interview loop, do a short playback of the primary scenario, the main exception or edge case, and any rule that must always hold.
+5. If user explicitly asks to skip questions or says "just testing", acknowledge and proceed with minimal discovery.
 
 ## Bulk-Edit Detection (mandatory check)
 
@@ -234,7 +248,7 @@ Store the final mission selection in your notes and include it in the spec outpu
 
 ## Workflow (0.11.0+)
 
-**Planning happens in the project root checkout - NO worktree created!**
+**Planning happens in the repository root checkout - NO worktree created!**
 
 1. Creates `kitty-specs/<mission_slug>/spec.md` directly in project root (the optional `NNN-` prefix is display-only metadata assigned at merge time)
 2. Automatically commits to target branch
@@ -244,7 +258,7 @@ Store the final mission selection in your notes and include it in the spec outpu
 
 ## Location
 
-- Work in: **Project root checkout** (not a worktree)
+- Work in: **Repository root checkout** (not a worktree)
 - Creates: `kitty-specs/<mission_slug>/spec.md` (the `NNN-` prefix is display-only and assigned at merge time)
 - Commits to: target branch (from `create --json` → `target_branch`)
 
@@ -283,7 +297,7 @@ Given that feature description, do this:
    - `mission_number`: **Display-only** numeric prefix, `null` pre-merge. Assigned at merge time. **Never** use this as a selector or identity.
    - `mission_type`: Mission type key (for example `software-dev`)
    - `slug`: Unnumbered mission slug (e.g., `checkout-upsell-flow`)
-   - `feature_dir`: Absolute path to the feature directory inside the main repo
+   - `feature_dir`: Absolute path to the feature directory inside the repository root checkout
    - `current_branch`: the branch you started from
    - `target_branch` / `base_branch`: deterministic branch contract for downstream commands
    - `planning_base_branch` / `merge_target_branch`: explicit landing-branch aliases
@@ -297,7 +311,7 @@ Given that feature description, do this:
    - Intended planning/base branch
    - Final merge target for later changes
    - Whether that matches the user's intended landing branch
-3. **Stay in the main repository**: No worktree is created during specify.
+3. **Stay in the repository root checkout**: No worktree is created during specify.
 
 4. Read the files created by `create`:
    - `<feature_dir>/spec.md` (already created, may be empty/template-filled)
@@ -322,7 +336,7 @@ Given that feature description, do this:
      "mission_slug": "my-feature",
      "friendly_name": "My Mission",
      "mission_type": "software-dev",
-     "target_branch": "main",
+     "target_branch": "<target-branch>",
      "vcs": "git",
      "created_at": "2026-01-01T00:00:00+00:00"
    }
@@ -338,14 +352,17 @@ Given that feature description, do this:
     - Use the discovery answers as your authoritative source of truth (do **not** rely on the raw invocation text)
     - For empty invocations, treat the synthesized interview summary as the canonical feature description
     - Identify: actors, actions, data, constraints, motivations, success metrics
+    - Prefer concrete scenario walkthrough facts (actor, trigger, success outcome, exception path) over abstract restatements
     - For any remaining ambiguity:
       - Ask the user a focused follow-up question immediately and halt work until they answer
       - Only use `[NEEDS CLARIFICATION: …]` when the user explicitly defers the decision
       - Record any interim assumption in the Assumptions section
       - Prioritize clarifications by impact: scope > outcomes > risks/security > user experience > technical details
     - Fill User Scenarios & Testing section (ERROR if no clear user flow can be determined)
+    - If terminology precision matters, fill the optional Domain Language section with canonical terms and ambiguous synonyms to avoid
     - Generate separated requirement tables: Functional (`FR-###`), Non-Functional (`NFR-###`), and Constraints (`C-###`)
     - Ensure each requirement entry has a status value and testable wording
+    - Capture rules or invariants that shape acceptance scenarios, edge cases, permissions, or lifecycle boundaries
     - Define Success Criteria (measurable, technology-agnostic outcomes)
     - Identify Key Entities (if data involved)
 

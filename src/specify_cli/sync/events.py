@@ -286,6 +286,10 @@ def emit_mission_created(
     mission_number: int | None,
     target_branch: str,
     wp_count: int,
+    mission_type: str = "software-dev",
+    friendly_name: str | None = None,
+    purpose_tldr: str | None = None,
+    purpose_context: str | None = None,
     created_at: str | None = None,
     causation_id: str | None = None,
     mission_id: str | None = None,
@@ -295,8 +299,12 @@ def emit_mission_created(
     event = get_emitter().emit_mission_created(
         mission_slug=mission_slug,
         mission_number=mission_number,
+        mission_type=mission_type,
         target_branch=target_branch,
         wp_count=wp_count,
+        friendly_name=friendly_name,
+        purpose_tldr=purpose_tldr,
+        purpose_context=purpose_context,
         created_at=created_at,
         causation_id=causation_id,
         mission_id=mission_id,
@@ -391,6 +399,84 @@ def emit_dependency_resolved(
         wp_id=wp_id,
         dependency_wp_id=dependency_wp_id,
         resolution_type=resolution_type,
+        causation_id=causation_id,
+    )
+    if event is not None:
+        _publish_event_via_sync_daemon(event, repo_root)
+        _request_dashboard_sync(repo_root)
+    return event
+
+
+def emit_token_usage_recorded(
+    mission_id: str,
+    input_tokens: int,
+    output_tokens: int,
+    total_tokens: int,
+    estimated_cost_usd: float,
+    source: str,
+    *,
+    run_id: str | None = None,
+    step_id: str | None = None,
+    wp_id: str | None = None,
+    phase_name: str | None = None,
+    actor: dict[str, Any] | None = None,
+    provider: str | None = None,
+    model: str | None = None,
+    causation_id: str | None = None,
+) -> dict[str, Any] | None:
+    """Emit TokenUsageRecorded via singleton."""
+    repo_root = _ensure_dashboard_sync_daemon_for_active_project()
+    event = get_emitter().emit_token_usage_recorded(
+        mission_id=mission_id,
+        run_id=run_id,
+        step_id=step_id,
+        wp_id=wp_id,
+        phase_name=phase_name,
+        actor=actor,
+        provider=provider,
+        model=model,
+        input_tokens=input_tokens,
+        output_tokens=output_tokens,
+        total_tokens=total_tokens,
+        estimated_cost_usd=estimated_cost_usd,
+        source=source,
+        causation_id=causation_id,
+    )
+    if event is not None:
+        _publish_event_via_sync_daemon(event, repo_root)
+        _request_dashboard_sync(repo_root)
+    return event
+
+
+def emit_diff_summary_recorded(
+    mission_id: str,
+    base_ref: str,
+    head_ref: str,
+    files_changed: int,
+    lines_added: int,
+    lines_deleted: int,
+    source: str,
+    *,
+    run_id: str | None = None,
+    step_id: str | None = None,
+    wp_id: str | None = None,
+    phase_name: str | None = None,
+    causation_id: str | None = None,
+) -> dict[str, Any] | None:
+    """Emit DiffSummaryRecorded via singleton."""
+    repo_root = _ensure_dashboard_sync_daemon_for_active_project()
+    event = get_emitter().emit_diff_summary_recorded(
+        mission_id=mission_id,
+        run_id=run_id,
+        step_id=step_id,
+        wp_id=wp_id,
+        phase_name=phase_name,
+        base_ref=base_ref,
+        head_ref=head_ref,
+        files_changed=files_changed,
+        lines_added=lines_added,
+        lines_deleted=lines_deleted,
+        source=source,
         causation_id=causation_id,
     )
     if event is not None:

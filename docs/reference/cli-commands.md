@@ -644,7 +644,7 @@ spec-kitty ops log --verbose
 
 **Synopsis**: `spec-kitty repair worktree [OPTIONS] [WORKTREE_PATH]`
 
-**Description**: Diagnose worktree kitty-specs/ status. Checks if worktrees have kitty-specs/ directories and explains how WP operations work: WP lane changes (move-task) always use main repo's kitty-specs/, research artifacts can be added to worktree's kitty-specs/, and stale WP files in worktrees don't affect lane operations.
+**Description**: Diagnose worktree kitty-specs/ status. Checks if worktrees have kitty-specs/ directories and explains how WP operations work: WP lane changes (move-task) always use the repository root checkout's `kitty-specs/`, research artifacts can be added to a worktree's `kitty-specs/`, and stale WP files in worktrees do not affect lane operations.
 
 **Arguments**:
 - `WORKTREE_PATH`: Specific worktree path to check (defaults to current directory if in a worktree) [optional]
@@ -1259,6 +1259,28 @@ spec-kitty next --agent claude --mission 034-my-feature --answer "approve" --dec
 spec-kitty migrate --dry-run
 spec-kitty migrate --force
 spec-kitty migrate --verbose
+```
+
+### spec-kitty migrate normalize-lifecycle
+
+**Synopsis**: `spec-kitty migrate normalize-lifecycle [OPTIONS]`
+
+**Description**: Normalize legacy `kitty-specs` mission state for the MVP lifecycle model. This command repairs enough historical mission state to make active/recent/stale/abandoned classification reliable across older repositories. It backfills missing identity, rebuilds missing event logs from legacy state, and regenerates derived `status`, `progress`, and `lifecycle` views used by the CLI and Teamspace. The command is safe to run more than once.
+
+**Options**:
+
+| Flag | Description |
+| --- | --- |
+| `--json` | Emit a structured per-mission normalization report |
+| `--dry-run` | Preview lifecycle normalization without modifying the filesystem |
+| `--mission SLUG` | Scope to a single mission slug instead of scanning all missions |
+| `--help` | Show this message and exit |
+
+**Examples**:
+```bash
+spec-kitty migrate normalize-lifecycle --dry-run
+spec-kitty migrate normalize-lifecycle --json
+spec-kitty migrate normalize-lifecycle --mission 083-private-teamspace
 ```
 
 ---

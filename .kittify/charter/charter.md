@@ -1,7 +1,7 @@
 # Spec Kitty Charter
 
 > Created: 2026-01-27
-> Version: 1.1.1
+> Version: 1.1.2
 
 ## Purpose
 
@@ -199,6 +199,14 @@ The 1.x/2.x branch split was originally documented in [ADR-12: Two-Branch Strate
 - **Breaking changes:** Update migration guide in docs/
 - **Architecture decisions:** Capture in ADRs (architecture/decisions/)
 
+### Branch-Intent Terminology Governance
+
+- Use **`repository root checkout`** for the non-worktree checkout where planning commands run.
+- Use **`current branch`**, **`target branch`**, **`planning_base_branch`**, and **`merge_target_branch`** for branch semantics.
+- Do **not** use **`main repository`**, **`main repo`**, or **`main repository root`** in user-facing docs or prompts.
+- Do **not** use **`main`** as a generic default branch name. Only use `main` when the actual branch is `main`.
+- When a document needs to talk about location and branch in the same sentence, name both explicitly instead of implying one from the other.
+
 ---
 
 ## User Customization Preservation
@@ -248,6 +256,12 @@ Operational reference:
 - The published current-state CLI↔SaaS contract lives at `../spec-kitty-saas/contracts/cli-saas-current-api.yaml`.
 - Any CLI change that alters hosted routes, request/response bodies, auth headers, websocket behavior, sync payloads, or tracker control-plane semantics must update that contract in the same change.
 - ADRs, PRDs, and roadmap notes may describe future APIs, but the authoritative reference for what the CLI actually speaks to SaaS today is that contract file.
+
+---
+
+## Tracker Ticket Assignment Rule
+
+1. When an agent starts implementing work from a tracker-backed issue for this repository, the agent must assign that ticket to the Human-in-Charge (HiC) before or as part of beginning the implementation. For Spec Kitty today, GitHub issues are the active tracker case and must follow this rule.
 
 ---
 

@@ -5,13 +5,13 @@ description: Create a mission specification
 
 **Version**: 0.11.0+
 
-## 📍 WORKING DIRECTORY: Stay in the project root checkout
+## 📍 WORKING DIRECTORY: Stay in the repository root checkout
 
-**IMPORTANT**: Specify works in the project root checkout. NO worktrees are created.
+**IMPORTANT**: Specify works in the repository root checkout. NO worktrees are created.
 
 ```bash
-# Run from project root:
-cd /path/to/project/root  # Your project root checkout
+# Run from the repository root checkout:
+cd /path/to/project/root  # Your repository root checkout
 
 # All planning artifacts are created in the project root and committed:
 # - kitty-specs/<mission_slug>/spec.md → Created in project root
@@ -249,7 +249,7 @@ Store the final mission selection in your notes and include it in the spec outpu
 
 ## Workflow (0.11.0+)
 
-**Planning happens in the project root checkout - NO worktree created!**
+**Planning happens in the repository root checkout - NO worktree created!**
 
 1. Creates `kitty-specs/<mission_slug>/spec.md` directly in project root (the optional `NNN-` prefix is display-only metadata assigned at merge time)
 2. Automatically commits to target branch
@@ -259,7 +259,7 @@ Store the final mission selection in your notes and include it in the spec outpu
 
 ## Location
 
-- Work in: **Project root checkout** (not a worktree)
+- Work in: **Repository root checkout** (not a worktree)
 - Creates: `kitty-specs/<mission_slug>/spec.md` (the `NNN-` prefix is display-only and assigned at merge time)
 - Commits to: target branch (from `create --json` → `target_branch`)
 
@@ -283,10 +283,14 @@ Given that feature description, do this:
    - Only proceed once every discovery question has an explicit answer and the user has acknowledged the Intent Summary.
    - Empty invocation rule: stay in interview mode until you can restate the agreed-upon feature description. Do **not** call the creation command while the description is missing or provisional.
 
-2. When discovery is complete and the intent summary, **title**, and **mission type** are confirmed, run the mission creation command from repo root:
+2. When discovery is complete and the intent summary, **title**, **purpose TLDR**, **purpose context paragraph**, and **mission type** are confirmed, run the mission creation command from repo root:
 
    ```bash
-   spec-kitty agent mission create "<slug>" --json
+   spec-kitty agent mission create "<slug>" \
+     --friendly-name "<title>" \
+     --purpose-tldr "<purpose_tldr>" \
+     --purpose-context "<purpose_context>" \
+     --json
    ```
 
    Where `<slug>` is a kebab-case version of the friendly title (e.g., "Checkout Upsell Flow" → "checkout-upsell-flow").
@@ -298,7 +302,10 @@ Given that feature description, do this:
    - `mission_number`: **Display-only** numeric prefix, `null` pre-merge. Assigned at merge time. **Never** use this as a selector or identity.
    - `mission_type`: Mission type key (for example `software-dev`)
    - `slug`: Unnumbered mission slug (e.g., `checkout-upsell-flow`)
-   - `feature_dir`: Absolute path to the feature directory inside the main repo
+   - `friendly_name`: Confirmed mission title
+   - `purpose_tldr`: One-line stakeholder-facing mission summary
+   - `purpose_context`: Short stakeholder-facing context paragraph
+   - `feature_dir`: Absolute path to the feature directory inside the repository root checkout
    - `current_branch`: the branch you started from
    - `target_branch` / `base_branch`: deterministic branch contract for downstream commands
    - `planning_base_branch` / `merge_target_branch`: explicit landing-branch aliases
@@ -312,7 +319,7 @@ Given that feature description, do this:
    - Intended planning/base branch
    - Final merge target for later changes
    - Whether that matches the user's intended landing branch
-3. **Stay in the main repository**: No worktree is created during specify.
+3. **Stay in the repository root checkout**: No worktree is created during specify.
 
 4. Read the files created by `create`:
    - `<feature_dir>/spec.md` (already created, may be empty/template-filled)
@@ -324,6 +331,8 @@ Given that feature description, do this:
    - **Never** modify identity fields from `create` (`mission_id`, `slug`, `mission_slug`, `created_at`, `target_branch`). `mission_id` is the canonical ULID and is immutable. `mission_number` is display-only and is `null` pre-merge — do not set it by hand.
    - Keep `target_branch` aligned to the value from `create --json` output. Never hardcode `main`.
    - Ensure `friendly_name` matches the confirmed title.
+   - Ensure `purpose_tldr` matches the confirmed one-line stakeholder summary.
+   - Ensure `purpose_context` matches the confirmed stakeholder context paragraph.
    - Ensure `mission_type` is correct.
    - Optionally add/update `source_description`.
    - Ensure `vcs` exists (`"git"` default).
@@ -336,8 +345,10 @@ Given that feature description, do this:
      "slug": "my-feature",
      "mission_slug": "my-feature",
      "friendly_name": "My Mission",
+     "purpose_tldr": "Keep the mission understandable to product and executive stakeholders.",
+     "purpose_context": "This mission exists to make the purpose of the work immediately legible to stakeholders who should not need to parse technical specification text to understand the value or expected outcome.",
      "mission_type": "software-dev",
-     "target_branch": "main",
+     "target_branch": "<target-branch>",
      "vcs": "git",
      "created_at": "2026-01-01T00:00:00+00:00"
    }

@@ -52,7 +52,7 @@ from specify_cli.merge.state import (
 from specify_cli.mission_metadata import resolve_mission_identity, write_meta
 from specify_cli.merge.workspace import _worktree_removal_delay, cleanup_merge_workspace
 from specify_cli.post_merge.stale_assertions import StaleAssertionReport, run_check
-from specify_cli.sync import emit_mission_closed
+from specify_cli.sync import emit_diff_summary_recorded, emit_mission_closed
 from specify_cli.sync.dossier_pipeline import trigger_feature_dossier_sync_if_enabled
 from specify_cli.status.wp_metadata import read_wp_frontmatter
 from specify_cli.tasks_support import TaskCliError, find_repo_root
@@ -189,7 +189,7 @@ def _mark_wp_merged_done(
 
     metadata, _body = read_wp_frontmatter(wp_path)
     from specify_cli.status.lane_reader import get_wp_lane
-    from specify_cli.status.models import DoneEvidence, ReviewApproval, TransitionRequest
+    from specify_cli.status.models import DoneEvidence, ReviewApproval
     from specify_cli.status.emit import emit_status_transition, TransitionError
     from specify_cli.status.history_parser import extract_done_evidence
     from specify_cli.status.transitions import resolve_lane_alias
@@ -594,6 +594,53 @@ def _resolve_target_branch(
     return resolve_primary_branch(repo_root), "primary_branch"
 
 
+def _emit_merge_diff_summary(
+    *,
+    repo_root: Path,
+    mission_id: str,
+    base_ref: str,
+    head_ref: str = "HEAD",
+    phase_name: str = "accept",
+) -> None:
+    """Emit one mission-level diff summary for the merged mission."""
+    ret, output, _ = run_command(
+        ["git", "diff", "--numstat", f"{base_ref}..{head_ref}"],
+        capture=True,
+        check_return=False,
+        cwd=repo_root,
+    )
+    if ret != 0:
+        return
+
+    files_changed = 0
+    lines_added = 0
+    lines_deleted = 0
+    for line in output.splitlines():
+        parts = line.split("\t", 2)
+        if len(parts) < 2:
+            continue
+        files_changed += 1
+        added_raw, deleted_raw = parts[0], parts[1]
+        if added_raw.isdigit():
+            lines_added += int(added_raw)
+        if deleted_raw.isdigit():
+            lines_deleted += int(deleted_raw)
+
+    if files_changed == 0 and lines_added == 0 and lines_deleted == 0:
+        return
+
+    emit_diff_summary_recorded(
+        mission_id=mission_id,
+        base_ref=base_ref,
+        head_ref=head_ref,
+        files_changed=files_changed,
+        lines_added=lines_added,
+        lines_deleted=lines_deleted,
+        phase_name=phase_name,
+        source="git-numstat",
+    )
+
+
 def _validate_target_branch(
     repo_root: Path,
     mission_slug: str | None,
@@ -838,6 +885,26 @@ def _run_lane_based_merge_locked(
         if mission_result.commit:
             console.print(f"  Commit: {mission_result.commit[:7]}")
 
+    # -- WP05/T006 FR-013: Post-merge working-tree refresh --
+    # Re-sync the primary checkout against HEAD so any paths that git left out
+    # (the observed legacy sparse-checkout case — Priivacy-ai/spec-kitty#588)
+    # are restored before we record done transitions and persist the final
+    # housekeeping commit. Running this refresh after writing status.events.jsonl
+    # would clobber the freshly-recorded done transitions back to HEAD.
+    # This is a no-op on a clean full checkout. Do not abort on failure: the
+    # WP01 commit-layer backstop is the final safety net.
+    _ret_checkout, _out_checkout, _err_checkout = run_command(
+        ["git", "checkout", "HEAD", "--", "."],
+        capture=True,
+        check_return=False,
+        cwd=main_repo,
+    )
+    if _ret_checkout != 0:
+        console.print(
+            f"[yellow]Warning:[/yellow] post-merge working-tree refresh failed: "
+            f"{(_err_checkout or '').strip()}"
+        )
+
     # -- T001: Mark WPs done with per-WP state tracking --
     console.print("  [dim]Recording merged work packages as done...[/dim]")
     for lane in lanes_manifest.lanes:
@@ -856,24 +923,6 @@ def _run_lane_based_merge_locked(
             completed_set.add(wp_id)
 
     _assert_merged_wps_reached_done(main_repo, mission_slug, all_wp_ids)
-
-    # -- WP05/T006 FR-013: Post-merge working-tree refresh --
-    # Re-sync the primary checkout against HEAD so any paths that git left out
-    # (the observed legacy sparse-checkout case — Priivacy-ai/spec-kitty#588)
-    # are restored before the housekeeping commit runs. This is a no-op on a
-    # clean full checkout. Do not abort on failure: the WP01 commit-layer
-    # backstop is the final safety net.
-    _ret_checkout, _out_checkout, _err_checkout = run_command(
-        ["git", "checkout", "HEAD", "--", "."],
-        capture=True,
-        check_return=False,
-        cwd=main_repo,
-    )
-    if _ret_checkout != 0:
-        console.print(
-            f"[yellow]Warning:[/yellow] post-merge working-tree refresh failed: "
-            f"{(_err_checkout or '').strip()}"
-        )
 
     # -- WP05/T007 FR-014: Post-merge working-tree invariant --
     # After the refresh, `git status --porcelain` MUST report at most the two
@@ -1036,6 +1085,12 @@ def _run_lane_based_merge_locked(
     # -- T002: Cleanup workspace (preserves state.json) then clear state --
     cleanup_merge_workspace(canonical_id, main_repo)
     clear_state(main_repo, canonical_id)
+
+    _emit_merge_diff_summary(
+        repo_root=main_repo,
+        mission_id=canonical_id,
+        base_ref=merge_base_sha,
+    )
 
     emit_mission_closed(
         mission_slug=mission_slug,
