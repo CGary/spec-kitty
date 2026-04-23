@@ -16,6 +16,7 @@ from specify_cli.core.agent_config import (
     AgentConfig,
     AgentConfigError,
 )
+from specify_cli.runtime.home import get_kittify_home
 from specify_cli.upgrade.migrations.m_0_9_1_complete_lane_migration import (
     AGENT_DIR_TO_KEY,
     CompleteLaneMigration,
@@ -166,8 +167,13 @@ def add_agents(
             agent_dir.mkdir(parents=True, exist_ok=True)
 
             # Generate templates for this agent
-            # Copy from mission templates
+            # Copy from mission templates (local first, then global fallback)
             missions_dir = repo_root / ".kittify" / "missions" / "software-dev" / "command-templates"
+            if not missions_dir.exists():
+                try:
+                    missions_dir = get_kittify_home() / "missions" / "software-dev" / "command-templates"
+                except RuntimeError:
+                    pass
 
             if missions_dir.exists():
                 for template_file in missions_dir.glob("*.md"):

@@ -18,6 +18,7 @@ from ruamel.yaml import YAML
 
 from specify_cli.cli import StepTracker, multi_select_with_arrows
 from specify_cli.core import (
+    AGENT_COMMAND_CONFIG,
     AI_CHOICES,
 )
 from specify_cli.core.vcs import (
@@ -500,6 +501,26 @@ def init(  # noqa: C901
                         if use_global:
                             _prepare_project_minimal(project_path)
                             copy_charter_templates(project_path)
+
+                            # Ensure local agent command folders exist even in global mode (feature 555 parity)
+                            # This allows native agent CLIs (like Gemini) to find commands locally.
+                            global_home = get_kittify_home()
+                            global_missions = global_home / "missions" / "software-dev" / "command-templates"
+
+                            for agent_key in selected_agents:
+                                agent_cmd_info = AGENT_COMMAND_CONFIG.get(agent_key)
+                                if not agent_cmd_info:
+                                    continue
+
+                                local_agent_dir = project_path / agent_cmd_info["dir"]
+                                local_agent_dir.mkdir(parents=True, exist_ok=True)
+
+                                # Copy templates from global home
+                                if global_missions.exists():
+                                    for template_file in global_missions.glob("*.md"):
+                                        dest_file = local_agent_dir / f"spec-kitty.{template_file.name}"
+                                        shutil.copy2(template_file, dest_file)
+
                             pkg_templates = _get_package_templates_root()
                             if pkg_templates is not None:
                                 templates_root = pkg_templates
@@ -556,11 +577,6 @@ def init(  # noqa: C901
                             f"{agent_key}-skills",
                             f"{installed} command skills installed",
                         )
-                    elif agent_skill_class == SKILL_CLASS_SHARED:
-                        # Other SHARED-class agents install their canonical skills
-                        # via the legacy installer path below (doctrine/tactic
-                        # skills), not command-skills.
-                        tracker.complete(f"{agent_key}-skills", "skipped (global runtime)")
                     else:
                         if skill_registry_per_agent is None:
                             if template_mode == "local" and local_repo is not None:
